@@ -39,7 +39,7 @@ import com.mysql.jdbc.Statement;
 public class Portal extends Activity {
 	private final static String TAG = "Portal";
 	protected ListView lv1;
-	protected ListView lv2;
+//	protected ListView lv2;
 //	private String s1[] = {"a", "b", "c", "d", "e", "f"};
 //	private String s2[] = {"r", "s", "t", "u", "v", "w", "x"};
 	protected String s3[];
@@ -57,7 +57,6 @@ public class Portal extends Activity {
 		findviews();
 		/* Async task */
 		new GetMailListTask().execute();
-		new GetBulletinBoardListTask().execute();
 
 	}
 	
@@ -93,7 +92,7 @@ public class Portal extends Activity {
 	}
 	private void findviews(){
 		lv1 = (ListView)findViewById(R.id.list1);
-		lv2 = (ListView)findViewById(R.id.list2);
+//		lv2 = (ListView)findViewById(R.id.list2);
 	}
 
 	public String getMailList(){
@@ -155,103 +154,11 @@ public class Portal extends Activity {
 				urls[i] = jsonData.get("HyperLink").toString();
 //				Log.e(TAG,"i ====> " + result[i]);
 			}
-//			bundle.putStringArray("url", urls);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 		return result;
 	}
-
-	private class GetBulletinBoardListTask extends AsyncTask<Void, Void, ArrayList<String>>{
-		protected ArrayList<String> doInBackground(Void... params) {
-			String result = getBulletinBoardList();
-			return convertJson2(result);
-		}
-		protected void onPostExecute(ArrayList<String> result){
-			Toast.makeText(getApplicationContext(), "command sent", Toast.LENGTH_LONG).show();
-			Log.e(TAG,"size2: "+result.size());
-			ArrayAdapter<String> adapter1 = new ArrayAdapter<String>(Portal.this, android.R.layout.simple_list_item_1, result);
-			lv2.setAdapter(adapter1);
-//			Portal.response =  result;
-			lv2.setTextFilterEnabled(true);
-			lv2.setOnItemClickListener(new OnItemClickListener(){
-				@Override
-				public void onItemClick(AdapterView<?> a, View view,
-						int pos, long id) {
-					// TODO Auto-generated method stub
-					Toast.makeText(Portal.this, "您選的是第"+pos+"個link", Toast.LENGTH_LONG).show();
-//					bundle.putString("url", urls[pos]);
-//					Intent intent = new Intent();
-//					intent.putExtras(bundle);
-//					intent.setClass(Portal.this, MailWebView.class);
-//					startActivity(intent);
-				}
-			});
-			Log.e(TAG,"74");
-		}
-	}
 	
-	public String getBulletinBoardList(){
-		HttpClient httpClient = new DefaultHttpClient();
-		HttpPost httpPost = new HttpPost("http://140.113.73.28/itri/getBulletinboard.php");
-		HttpResponse httpResponse = null;
-		HttpEntity httpEntity = null;
-		InputStream inputStream = null;
-		String result= "";
-		
-		ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
-		/* for query string */
-//		params.add(new BasicNameValuePair("query_string", "124"));
-		/* for query string */
-		try {
-			httpPost.setEntity(new UrlEncodedFormEntity(params, HTTP.UTF_8));
-			httpResponse = httpClient.execute(httpPost);
-			if(httpResponse.getStatusLine().getStatusCode() == 200)
-			{
-				Log.e(TAG,"http request success");
-				httpEntity = httpResponse.getEntity();
-				inputStream = httpEntity.getContent();
-				BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "utf-8"));
-				
-				StringBuilder builder = new StringBuilder();
-				String line = null;
-				
-				while( (line = bufferedReader.readLine()) != null ){
-					builder.append(line + "\n");
-				}
-				inputStream.close();
-				result = builder.toString();
-				Log.e(TAG, "restlt 2 : " + result);
-			}
-			else{
-//				inputStream.close();
-				Log.e(TAG,"http request error");
-			}
-		} catch (IllegalStateException e) {
-			// TODO Auto-generated catch block
-			Log.e(TAG," 127 error");
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			Log.e(TAG," 131 error");
-			e.printStackTrace();
-		}
-		return result;
-	}
 	
-	private ArrayList<String> convertJson2(String jsonString){
-		ArrayList<String> result = new ArrayList<String>();
-		try {
-			JSONArray jsonArray = new JSONArray(jsonString);
-			for(int i = 0; i< jsonArray.length(); i++){
-				JSONObject jsonData = jsonArray.getJSONObject(i);
-				result.add(jsonData.get("subject").toString());
-//				Log.e(TAG,"i ====> " + result[i]);
-			}
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		return result;
-	}
-
 }
