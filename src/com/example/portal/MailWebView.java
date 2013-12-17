@@ -5,7 +5,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.util.Log;
-import android.webkit.WebChromeClient;
+//import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -22,22 +22,22 @@ public class MailWebView extends Activity {
   
 		Bundle bundle =this.getIntent().getExtras();
 		String url = bundle.getString("url");
-		Log.e("url", url);
 		
 		findview();
 		
 		webview.getSettings().setSupportZoom(true);
 		webview.getSettings().setJavaScriptEnabled(true);
 		webview.getSettings().setBuiltInZoomControls(true);
-//		webSetting.setDomStorageEnabled(true);
-//		
+//		webview.getSettings().setDomStorageEnabled(true);
+		/* 讓webview開起來的時候不會那麼大 */
+		webview.getSettings().setLoadWithOverviewMode(true);
+		webview.getSettings().setUseWideViewPort(true);
+		/* 讓webview開起來的時候不會那麼大 */
+//		webview.getSettings().setDefaultZoom(WebSettings.ZoomDensity.CLOSE);
 		webview.setWebViewClient(new WebViewClient());
 //		webview.setWebChromeClient(new WebChromeClient());
-//		
 		webview.loadUrl(url);
 	}
-
-	
 	private void findview(){
 		webview = (WebView)findViewById(R.id.mybrowser);
 	}
