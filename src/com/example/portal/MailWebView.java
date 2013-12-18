@@ -28,14 +28,19 @@ public class MailWebView extends Activity {
 		webview.getSettings().setSupportZoom(true);
 		webview.getSettings().setJavaScriptEnabled(true);
 		webview.getSettings().setBuiltInZoomControls(true);
+		
 //		webview.getSettings().setDomStorageEnabled(true);
+		
 		/* 讓webview開起來的時候不會那麼大 */
 		webview.getSettings().setLoadWithOverviewMode(true);
 		webview.getSettings().setUseWideViewPort(true);
 		/* 讓webview開起來的時候不會那麼大 */
 //		webview.getSettings().setDefaultZoom(WebSettings.ZoomDensity.CLOSE);
+		
 		webview.setWebViewClient(new WebViewClient());
+		
 //		webview.setWebChromeClient(new WebChromeClient());
+		
 		webview.loadUrl(url);
 	}
 	private void findview(){

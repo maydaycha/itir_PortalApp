@@ -77,7 +77,6 @@ public class Portal extends Activity {
 				@Override
 				public void onItemClick(AdapterView<?> a, View view,
 						int pos, long id) {
-					// TODO Auto-generated method stub
 					Toast.makeText(Portal.this, "您選的是第"+pos+"個link", Toast.LENGTH_LONG).show();
 					bundle.putString("url", urls[pos]);
 					Intent intent = new Intent();
