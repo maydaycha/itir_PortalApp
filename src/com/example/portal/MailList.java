@@ -26,6 +26,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -33,39 +34,40 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
 
 public class MailList extends Activity {
 	private final static String TAG = "Portal";
 	protected ListView lv1;
-//	protected ListView lv2;
-	private Button logout;
-//	private String s1[] = {"a", "b", "c", "d", "e", "f"};
-//	private String s2[] = {"r", "s", "t", "u", "v", "w", "x"};
+	//	protected ListView lv2;
+	private Button menu;
+	//	private String s1[] = {"a", "b", "c", "d", "e", "f"};
+	//	private String s2[] = {"r", "s", "t", "u", "v", "w", "x"};
 	protected String s3[];
 	protected static String[] response = null;
 	protected Bundle bundle = new Bundle();
 	String urls[];
-//	protected String jsonString; 
-//	protected static ArrayAdapter<String> adapter1;
+	//	protected String jsonString; 
+	//	protected static ArrayAdapter<String> adapter1;
 	SharedPreferences settings;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_maillist);
-		
+
 		Log.e("wel2", ""+checkSessionExist());
-		
+
 		findviews();
 		setListener();
 		/* Async task */
 		new GetMailListTask().execute();
 
 	}
-	
-	
+
+
 	public class GetMailListTask extends AsyncTask<Void, Void, ArrayList<String>>{
 		protected ArrayList<String> doInBackground(Void... params) {
 			String result = getMailList();
@@ -75,19 +77,19 @@ public class MailList extends Activity {
 			Log.e(TAG,"size: "+result.size());
 			ArrayAdapter<String> adapter1 = new ArrayAdapter<String>(MailList.this, android.R.layout.simple_list_item_1, result);
 			lv1.setAdapter(adapter1);
-//			Portal.response =  result;
+			//			Portal.response =  result;
 			lv1.setTextFilterEnabled(true);
 			lv1.setOnItemClickListener(new OnItemClickListener(){
 				@Override
 				public void onItemClick(AdapterView<?> a, View view,
 						int pos, long id) {
-//					Toast.makeText(MailList.this, "您選的是第"+pos+"個link", Toast.LENGTH_LONG).show();
+					//					Toast.makeText(MailList.this, "您選的是第"+pos+"個link", Toast.LENGTH_LONG).show();
 					bundle.putString("url", urls[pos]);
 					Intent intent = new Intent();
 					intent.putExtras(bundle);
 					intent.setClass(MailList.this, MailWebView.class);
 					startActivity(intent);
-					
+
 				}
 			});
 			Log.e(TAG,"74");
@@ -95,18 +97,24 @@ public class MailList extends Activity {
 	}
 	private void findviews(){
 		lv1 = (ListView)findViewById(R.id.list1);
-//		lv2 = (ListView)findViewById(R.id.list2);
-		logout = (Button)findViewById(R.id.button_logout);
+		//		lv2 = (ListView)findViewById(R.id.list2);
+		menu = (Button)findViewById(R.id.button_logout);
 	}
 	private void setListener(){
-		logout.setOnClickListener(l);
+		menu.setOnClickListener(j);
 	}
+
 	OnClickListener l = new OnClickListener(){
 		public void onClick(View view){
 			removeLogin_status();
 			Intent intent = new Intent();
 			intent.setClass(MailList.this, WelcomeActivity.class);
 			startActivity(intent);
+		}
+	};
+	OnClickListener j = new OnClickListener(){
+		public void onClick(View view){
+			showPopupmenu(view);
 		}
 	};
 
@@ -117,10 +125,10 @@ public class MailList extends Activity {
 		HttpEntity httpEntity = null;
 		InputStream inputStream = null;
 		String result= "";
-		
+
 		ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
 		/* for query string */
-//		params.add(new BasicNameValuePair("query_string", "124"));
+		//		params.add(new BasicNameValuePair("query_string", "124"));
 		/* for query string */
 		try {
 			httpPost.setEntity(new UrlEncodedFormEntity(params, HTTP.UTF_8));
@@ -131,10 +139,10 @@ public class MailList extends Activity {
 				httpEntity = httpResponse.getEntity();
 				inputStream = httpEntity.getContent();
 				BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "utf-8"));
-				
+
 				StringBuilder builder = new StringBuilder();
 				String line = null;
-				
+
 				while( (line = bufferedReader.readLine()) != null ){
 					builder.append(line + "\n");
 				}
@@ -142,10 +150,10 @@ public class MailList extends Activity {
 				result = builder.toString();
 			}
 			else{
-//				inputStream.close();
+				//				inputStream.close();
 				Log.e(TAG,"http request error");
 			}
-			
+
 		} catch (IllegalStateException e) {
 			// TODO Auto-generated catch block
 			Log.e(TAG," 127 error");
@@ -157,7 +165,7 @@ public class MailList extends Activity {
 		}
 		return result;
 	}
-	
+
 	private ArrayList<String> convertJson(String jsonString){
 		ArrayList<String> result = new ArrayList<String>();
 		try {
@@ -167,23 +175,42 @@ public class MailList extends Activity {
 				JSONObject jsonData = jsonArray.getJSONObject(i);
 				result.add(jsonData.get("Subject").toString());
 				urls[i] = jsonData.get("HyperLink").toString();
-//				Log.e(TAG,"i ====> " + result[i]);
+				//				Log.e(TAG,"i ====> " + result[i]);
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 		return result;
 	}
-	
+
 	private boolean checkSessionExist(){
 		settings = getSharedPreferences(Utilty._login,0);
 		return settings.getBoolean(Utilty._login_status, false);
 	}
-	
+
 	public void removeLogin_status(){
 		settings = getSharedPreferences(Utilty._login,0);
 		settings.edit().remove(Utilty._login_status).commit();
-		
+
 	}
-	
+
+	private void showPopupmenu(View v){
+		PopupMenu popupMenu = new PopupMenu(MailList.this, v);
+		popupMenu.getMenuInflater().inflate(R.menu.option, popupMenu.getMenu());
+
+		popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+
+			@Override
+			public boolean onMenuItemClick(MenuItem item) {
+				Toast.makeText(MailList.this,
+						item.toString(),
+						Toast.LENGTH_LONG).show();
+				return true;
+			}
+		});
+
+		popupMenu.show();
+	}
 }
+
+
