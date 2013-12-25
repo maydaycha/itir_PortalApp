@@ -23,39 +23,43 @@ import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
 
-import com.example.portal.MainActivity;
-import com.example.portal.Portal;
+import com.example.portal.LoginActivity;
+import com.example.portal.MailList;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.webkit.CookieManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class MainActivity extends Activity {
+public class LoginActivity extends Activity {
 	private final String TAG = "MainActivity";
-	Button login;
+	
+	protected SharedPreferences  settings;
+	Button login, go;
 	EditText account;
 	EditText password;
+	
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.activity_login);
 		setRequestedOrientation( ActivityInfo.SCREEN_ORIENTATION_PORTRAIT );
-
+		
 		findViews();
 		setListener();
 	}
 
 	private void findViews(){
-		login = (Button)findViewById(R.id.button1);
+		login = (Button)findViewById(R.id.button_login);
 		account = (EditText)findViewById(R.id.account);
 		password = (EditText)findViewById(R.id.password);
 	}
@@ -70,7 +74,7 @@ public class MainActivity extends Activity {
 			new LoginTask().execute();	
 		}
 	};
-
+	
 	private boolean login(String username, String password){
 		HttpClient httpClient = new DefaultHttpClient();
 		HttpPost httpPost = new HttpPost("http://118.163.49.158:8080/Portal/login");
@@ -114,7 +118,7 @@ public class MainActivity extends Activity {
 					for (int i = cookies.size(); i > 0; i --) {
 						Cookie cookie = (Cookie) cookies.get(i - 1);
 						if (cookie.getName().equalsIgnoreCase("PLAY_SESSION")) {
-							// store cookie for session sharing in between and browser
+							// store cookie for session sharing with webview and browser
 							Utilty.appCookie = cookie;
 //							Log.e(TAG, "exist? "+cookie.getValue().indexOf("portalUser"));
 							
@@ -134,16 +138,14 @@ public class MainActivity extends Activity {
 			}
 
 		} catch (IllegalStateException e) {
-			Log.e(TAG," 127 error");
 			e.printStackTrace();
 		} catch (IOException e) {
-			Log.e(TAG," 131 error");
 			e.printStackTrace();
 		}
 		return true;
 	}
 
-	private class LoginTask extends AsyncTask<Void, Void, Boolean>{
+	public class LoginTask extends AsyncTask<Void, Void, Boolean>{
 
 		@Override
 		protected Boolean doInBackground(Void... arg0) {
@@ -154,18 +156,41 @@ public class MainActivity extends Activity {
 		}
 		protected void onPostExecute(Boolean result){
 			if(result){
+				Log.e("may_log", ""+readLogin_status());
+				saveLogin_status();
+				Log.e("may_log", ""+readLogin_status());
+//				Utilty._signal = true;
 				Bundle bundle = new Bundle();
 				Intent intent = new Intent();
 				intent.putExtras(bundle);
-				intent.setClass(MainActivity.this, Portal.class);
+				intent.setClass(LoginActivity.this, MailList.class);
 				startActivity(intent);
 			}
 			else{
-				Toast.makeText(MainActivity.this, "Account or Password error", Toast.LENGTH_SHORT).show();
+				Toast t = Toast.makeText(LoginActivity.this, "Account or Password error", Toast.LENGTH_SHORT);
+				t.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER, 12, 100);
+				t.show();
 				Log.e(TAG,"log in error");
 			}
 		}
 
 
 	}
+	
+	public void saveLogin_status(){
+		settings = getSharedPreferences(Utilty._login,0);
+		settings.edit().putBoolean(Utilty._login_status, false).commit();
+		
+	}
+	public void saveLogin_status2(){
+		settings = getSharedPreferences(Utilty._login,0);
+		settings.edit().putBoolean(Utilty._login_status, true).commit();
+		
+	}
+	private boolean readLogin_status(){
+		settings = getSharedPreferences(Utilty._login,0);
+		return settings.getBoolean(Utilty._login_status, true);
+	}
+	
+	
 }

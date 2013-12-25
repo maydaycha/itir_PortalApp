@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity" >
+    tools:context=".LoginActivity" >
 
     <ImageView
         android:id="@+id/imageView1"
@@ -33,10 +33,12 @@
         android:inputType="textPassword" />
 
     <Button
-        android:id="@+id/button1"
+        android:id="@+id/button_login"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center" 
         android:text="Login" />
+    
+
 
 </LinearLayout>

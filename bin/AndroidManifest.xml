@@ -14,21 +14,25 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.example.portal.MainActivity"
+            android:name="com.example.portal.LoginActivity"
             android:label="@string/app_name" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+       
         </activity>
         <activity
-            android:name="com.example.portal.Portal"
+            android:name="com.example.portal.MailList"
             android:label="@string/title_activity_portal" >
         </activity>
         <activity
             android:name="com.example.portal.MailWebView"
             android:label="@string/title_activity_web_view" >
+        </activity>
+        <activity
+            android:name="com.example.portal.WelcomeActivity"
+            android:label="@string/title_activity_welcome" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
     </application>
 
