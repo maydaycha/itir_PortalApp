@@ -18,8 +18,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.example.portal.LoginActivity.LoginTask;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -33,6 +31,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.Toast;
@@ -43,6 +42,7 @@ public class MailList extends Activity {
 	protected ListView lv1;
 	//	protected ListView lv2;
 	private Button menu;
+	private ImageButton set;
 	//	private String s1[] = {"a", "b", "c", "d", "e", "f"};
 	//	private String s2[] = {"r", "s", "t", "u", "v", "w", "x"};
 	protected String s3[];
@@ -97,14 +97,14 @@ public class MailList extends Activity {
 	}
 	private void findviews(){
 		lv1 = (ListView)findViewById(R.id.list1);
-		//		lv2 = (ListView)findViewById(R.id.list2);
-		menu = (Button)findViewById(R.id.button_logout);
+//		menu = (Button)findViewById(R.id.button_logout);
+		set = (ImageButton)findViewById(R.id.set);
 	}
 	private void setListener(){
-		menu.setOnClickListener(j);
+		set.setOnClickListener(j);
 	}
 
-	OnClickListener l = new OnClickListener(){
+	OnClickListener logoutListener = new OnClickListener(){
 		public void onClick(View view){
 			removeLogin_status();
 			Intent intent = new Intent();
@@ -193,6 +193,10 @@ public class MailList extends Activity {
 		settings.edit().remove(Utilty._login_status).commit();
 
 	}
+	private void logout(){
+		removeLogin_status();
+		Intent intent = new Intent();
+	}
 
 	private void showPopupmenu(View v){
 		PopupMenu popupMenu = new PopupMenu(MailList.this, v);
@@ -205,6 +209,14 @@ public class MailList extends Activity {
 				Toast.makeText(MailList.this,
 						item.toString(),
 						Toast.LENGTH_LONG).show();
+				
+				if(item.toString().equals("Logout")){
+					removeLogin_status();
+					Intent intent = new Intent();
+					intent.setClass(MailList.this, WelcomeActivity.class);
+					startActivity(intent);
+				}
+				
 				return true;
 			}
 		});

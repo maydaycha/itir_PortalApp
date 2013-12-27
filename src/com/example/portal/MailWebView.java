@@ -53,6 +53,7 @@ public class MailWebView extends Activity {
 		Log.e("may_web", ""+readLogin_status());
 		
 		if(!readLogin_status()){
+			
 			//	CookieSyncManager.createInstance(this);
 			CookieSyncManager cookieSyncManager = CookieSyncManager.createInstance(this);
 			CookieManager cookieManager = CookieManager.getInstance();
@@ -61,8 +62,9 @@ public class MailWebView extends Activity {
 			Log.e(TAG,"cookie1 ==>"+ cookieManager.getCookie(url));
 
 			if (newCookie != null) {
+				Log.e("may","removeSession");
 				cookieManager.removeSessionCookie();
-
+				Log.e("may","setSession");
 				/* construct session */
 				String cookieString = sessionCookie.getName() + "=" + sessionCookie.getValue() + "; domain=" + sessionCookie.getDomain() + "; path=" + sessionCookie.getPath() + "; expiry=null";
 
