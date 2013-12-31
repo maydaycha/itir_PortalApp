@@ -4,15 +4,20 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -70,7 +75,8 @@ public class MailList extends Activity {
 
 	public class GetMailListTask extends AsyncTask<Void, Void, ArrayList<String>>{
 		protected ArrayList<String> doInBackground(Void... params) {
-			String result = getMailList();
+			String result = getMailList_POST();
+//			String result = getMailList_GET();
 			return convertJson(result);
 		}
 		protected void onPostExecute(ArrayList<String> result){
@@ -97,7 +103,7 @@ public class MailList extends Activity {
 	}
 	private void findviews(){
 		lv1 = (ListView)findViewById(R.id.list1);
-//		menu = (Button)findViewById(R.id.button_logout);
+		//		menu = (Button)findViewById(R.id.button_logout);
 		set = (ImageButton)findViewById(R.id.set);
 	}
 	private void setListener(){
@@ -118,9 +124,11 @@ public class MailList extends Activity {
 		}
 	};
 
-	public String getMailList(){
+	public String getMailList_POST(){
 		HttpClient httpClient = new DefaultHttpClient();
-		HttpPost httpPost = new HttpPost("http://140.113.73.28/itri/getMailList.php");
+//		HttpPost httpPost = new HttpPost("http://140.113.73.28/itri/getMailList.php");
+		HttpPost httpPost = new HttpPost("http://118.163.49.158:8080/Portal/Android_getMail");
+		Log.e(TAG,"126");
 		HttpResponse httpResponse = null;
 		HttpEntity httpEntity = null;
 		InputStream inputStream = null;
@@ -128,11 +136,20 @@ public class MailList extends Activity {
 
 		ArrayList<NameValuePair> params = new ArrayList<NameValuePair>();
 		/* for query string */
-		//		params.add(new BasicNameValuePair("query_string", "124"));
+		params.add(new BasicNameValuePair("Limit", "10"));
 		/* for query string */
+		
+		if(Utilty.appCookie != null){
+			String cookieString = Utilty.appCookie.getName() + "=" + Utilty.appCookie.getValue() + "; domain=" + Utilty.appCookie.getDomain() + "; path=" + Utilty.appCookie.getPath();
+			Log.d(TAG, "Setting Cookie: "+Utilty.appCookie);
+			httpPost.setHeader("Cookie", cookieString);
+		} else {
+			Log.i(TAG, "Null session request get()");
+		}
 		try {
 			httpPost.setEntity(new UrlEncodedFormEntity(params, HTTP.UTF_8));
 			httpResponse = httpClient.execute(httpPost);
+			Log.e(TAG,"response code: "+httpResponse.getStatusLine().getStatusCode());
 			if(httpResponse.getStatusLine().getStatusCode() == 200)
 			{
 				Log.e(TAG,"http request success");
@@ -146,6 +163,7 @@ public class MailList extends Activity {
 				while( (line = bufferedReader.readLine()) != null ){
 					builder.append(line + "\n");
 				}
+				Log.e("http", "result: "+builder);
 				inputStream.close();
 				result = builder.toString();
 			}
@@ -163,6 +181,58 @@ public class MailList extends Activity {
 			Log.e(TAG," 131 error");
 			e.printStackTrace();
 		}
+		return result;
+	}
+
+	public String getMailList_GET() {
+		String line;
+		String result = "";
+		String urlToRead = "http://118.163.49.158:8080/Portal/Android_getMail?Limit=10";
+		StringBuilder builder = new StringBuilder();
+		try {
+			HttpClient client = new DefaultHttpClient();
+			HttpGet request = new HttpGet(urlToRead);
+			// set cookie
+			if(Utilty.appCookie != null){
+				String cookieString = Utilty.appCookie.getName() + "=" + Utilty.appCookie.getValue() + "; domain=" + Utilty.appCookie.getDomain() + "; path=" + Utilty.appCookie.getPath();
+				Log.d(TAG, "Setting Cookie: "+Utilty.appCookie);
+				request.setHeader("Cookie", cookieString);
+			} else {
+				Log.i(TAG, "Null session request get()");
+			}
+			
+			HttpResponse httpResponse = client.execute(request);
+
+			if(httpResponse.getStatusLine().getStatusCode() == 200)
+			{
+				Log.e(TAG,"http GET request success");
+				HttpEntity httpEntity = httpResponse.getEntity();
+				InputStream inputStream = httpEntity.getContent();
+				BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "utf-8"));
+
+				builder = new StringBuilder();
+				line = null;
+
+				while( (line = bufferedReader.readLine()) != null ){
+					builder.append(line + "\n");
+				}
+				Log.e(TAG, "GET result: "+builder);
+				inputStream.close();
+				result = builder.toString();
+			}
+//			Header[] headers = httpResponse.getAllHeaders();
+//			for (int i=0; i < headers.length; i++) {
+//				Header h = headers[i];
+//				Log.i(TAG, "Header names: "+h.getName());
+//				Log.i(TAG, "Header Value: "+h.getValue());
+//			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		result = builder.toString();
+		//	      Log.e(TAG,"GET result: " + result);
 		return result;
 	}
 
@@ -209,14 +279,14 @@ public class MailList extends Activity {
 				Toast.makeText(MailList.this,
 						item.toString(),
 						Toast.LENGTH_LONG).show();
-				
+
 				if(item.toString().equals("Logout")){
 					removeLogin_status();
 					Intent intent = new Intent();
 					intent.setClass(MailList.this, WelcomeActivity.class);
 					startActivity(intent);
 				}
-				
+
 				return true;
 			}
 		});
