@@ -50,7 +50,7 @@ public class MailWebView extends Activity {
 		webview.setWebViewClient(new WebViewClient());
 
 		//		webview.setWebChromeClient(new WebChromeClient());
-		Log.e("may_web", ""+readLogin_status());
+		Log.e("may_web", "need set session? "+ !readLogin_status());
 		
 		if(!readLogin_status()){
 			
@@ -66,7 +66,7 @@ public class MailWebView extends Activity {
 				cookieManager.removeSessionCookie();
 				Log.e("may","setSession");
 				/* construct session */
-				String cookieString = sessionCookie.getName() + "=" + sessionCookie.getValue() + "; domain=" + sessionCookie.getDomain() + "; path=" + sessionCookie.getPath() + "; expiry=null";
+				String cookieString = sessionCookie.getName() + "=" + sessionCookie.getValue() + "; domain=" + sessionCookie.getDomain() + "; path=" + sessionCookie.getPath();
 
 				cookieManager.setAcceptCookie(true);
 				cookieManager.setCookie("http://118.163.49.158/Portal/", cookieString);
